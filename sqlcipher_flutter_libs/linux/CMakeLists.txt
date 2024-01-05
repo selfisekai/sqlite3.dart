@@ -6,16 +6,11 @@ project(${PROJECT_NAME} LANGUAGES C CXX)
 # not be changed
 set(PLUGIN_NAME "sqlcipher_flutter_libs_plugin")
 
-set(OPENSSL_USE_STATIC_LIBS TRUE)
-find_package(OpenSSL REQUIRED)
+find_package(PkgConfig REQUIRED)
 
-# Using a prebuilt sqlcipher amalgation because building it requires TCL/TK which no one has.
-file(DOWNLOAD "https://storage.googleapis.com/simon-public-euw3/assets/sqlcipher/v4_5_5.c" "${CMAKE_CURRENT_BINARY_DIR}/sqlcipher.c" EXPECTED_HASH SHA512=04e71c0fa7a1e4736bc464e3b7379128d3d33bf149f3839f55729ad8fba9a916a6ca4118c75aa7e9c6a9133d71d4c1f59a13a7db029974865418aa565ecb2dc5)
+pkg_search_module(SQLCIPHER sqlcipher REQUIRED IMPORTED_TARGET)
 
-add_library(${PLUGIN_NAME} SHARED
-  "sqlite3_flutter_libs_plugin.cc"
-  "${CMAKE_CURRENT_BINARY_DIR}/sqlcipher.c"
-)
+target_link_libraries(${PLUGIN_NAME} PRIVATE flutter PkgConfig::SQLCIPHER)
 
 # Not applying the standard settings because we compile sqlite3
 # which fails with -Wall -Werror. But we apply most of them:
@@ -27,30 +22,3 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES
 target_compile_definitions(${PLUGIN_NAME} PRIVATE FLUTTER_PLUGIN_IMPL)
 target_include_directories(${PLUGIN_NAME} INTERFACE
   "${CMAKE_CURRENT_SOURCE_DIR}/include")
-target_link_libraries(${PLUGIN_NAME} PRIVATE flutter OpenSSL::Crypto)
-
-# Note: Keep in sync with https://github.com/simolus3/sqlite-native-libraries/blob/master/sqlite3-native-library/cpp/CMakeLists.txt
-# SQLITE_HAS_CODEC is required for sqlcipher
-target_compile_definitions(${PLUGIN_NAME} PRIVATE
-  SQLITE_HAS_CODEC
-  SQLITE_DQS=0
-  SQLITE_THREADSAFE=1
-  SQLITE_DEFAULT_MEMSTATUS=0
-  SQLITE_TEMP_STORE=2
-  SQLITE_MAX_EXPR_DEPTH=0
-  SQLITE_OMIT_AUTHORIZATION
-  SQLITE_OMIT_DECLTYPE
-  SQLITE_OMIT_DEPRECATED
-  SQLITE_OMIT_GET_TABLE
-  SQLITE_OMIT_LOAD_EXTENSION
-  SQLITE_OMIT_PROGRESS_CALLBACK
-  SQLITE_OMIT_SHARED_CACHE
-  SQLITE_OMIT_TCL_VARIABLE
-  SQLITE_OMIT_TRACE
-  SQLITE_USE_ALLOCA
-  SQLITE_UNTESTABLE
-  SQLITE_HAVE_ISNAN
-  SQLITE_ENABLE_FTS5
-  SQLITE_ENABLE_JSON1
-  SQLITE_ENABLE_RTREE
-)

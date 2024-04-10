@@ -4,8 +4,6 @@ import 'dart:typed_data';
 
 import 'package:ffi/ffi.dart' as ffi;
 
-import 'sqlite3.g.dart';
-
 const allocate = ffi.malloc;
 
 /// Loads a null-pointer with a specified type.
@@ -41,7 +39,7 @@ Pointer<Uint8> allocateBytes(List<int> bytes, {int additionalLength = 0}) {
   return ptr;
 }
 
-extension Utf8Utils on Pointer<sqlite3_char> {
+extension Utf8Utils on Pointer<Char> {
   int get _length {
     final asBytes = cast<Uint8>();
     var length = 0;
@@ -60,7 +58,7 @@ extension Utf8Utils on Pointer<sqlite3_char> {
     return utf8.decode(cast<Uint8>().asTypedList(resolvedLength));
   }
 
-  static Pointer<sqlite3_char> allocateZeroTerminated(String string) {
+  static Pointer<Char> allocateZeroTerminated(String string) {
     return allocateBytes(utf8.encode(string), additionalLength: 1).cast();
   }
 }

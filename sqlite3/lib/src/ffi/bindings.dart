@@ -101,7 +101,7 @@ final class FfiBindings extends RawSqliteBindings {
     final namePtr = Utf8Utils.allocateZeroTerminated(name);
     final outDb = allocate<Pointer<sqlite3>>();
     final vfsPtr = zVfs == null
-        ? nullPtr<sqlite3_char>()
+        ? nullPtr<Char>()
         : Utf8Utils.allocateZeroTerminated(zVfs);
 
     final resultCode =
@@ -318,7 +318,7 @@ final class FfiStatementCompiler extends RawStatementCompiler {
   final FfiDatabase database;
   final Pointer<Uint8> sql;
   final Pointer<Pointer<sqlite3_stmt>> stmtOut = allocate();
-  final Pointer<Pointer<sqlite3_char>> pzTail = allocate();
+  final Pointer<Pointer<Char>> pzTail = allocate();
 
   FfiStatementCompiler(this.database, this.sql);
 
@@ -705,7 +705,7 @@ typedef _XFinal = Void Function(Pointer<sqlite3_context>);
 typedef _XCompare = Int Function(
     Pointer<Void>, Int, Pointer<Void>, Int, Pointer<Void>);
 typedef _UpdateHook = Void Function(
-    Pointer<Void>, Int, Pointer<sqlite3_char>, Pointer<sqlite3_char>, Int64);
+    Pointer<Void>, Int, Pointer<Char>, Pointer<Char>, Int64);
 
 extension on RawXFunc {
   NativeCallable<_XFunc> toNative(Bindings bindings) {
@@ -739,8 +739,8 @@ extension on RawCollation {
         int lengthB,
         Pointer<Void> b,
       ) {
-        final dartA = a.cast<sqlite3_char>().readNullableString(lengthA);
-        final dartB = b.cast<sqlite3_char>().readNullableString(lengthB);
+        final dartA = a.cast<Char>().readNullableString(lengthA);
+        final dartB = b.cast<Char>().readNullableString(lengthB);
 
         return this(dartA, dartB);
       },
@@ -752,8 +752,8 @@ extension on RawCollation {
 extension on RawUpdateHook {
   NativeCallable<_UpdateHook> toNative() {
     return NativeCallable.isolateLocal(
-      (Pointer<Void> _, int kind, Pointer<sqlite3_char> db,
-          Pointer<sqlite3_char> table, int rowid) {
+      (Pointer<Void> _, int kind, Pointer<Char> db,
+          Pointer<Char> table, int rowid) {
         final tableName = table.readString();
         this(kind, tableName, rowid);
 

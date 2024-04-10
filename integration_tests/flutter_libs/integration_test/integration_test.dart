@@ -3,7 +3,6 @@ import 'dart:ffi';
 import 'package:integration_test/integration_test.dart';
 import 'package:test/test.dart';
 import 'package:sqlite3/sqlite3.dart';
-import 'package:sqlite3/src/ffi/sqlite3.g.dart' hide sqlite3;
 import 'package:sqlite3/src/ffi/memory.dart';
 import 'package:sqlite3/open.dart';
 
@@ -23,7 +22,7 @@ void main() {
     String? lastOption;
     var i = 0;
     do {
-      final ptr = getCompileOption(i).cast<sqlite3_char>();
+      final ptr = getCompileOption(i).cast<Char>();
 
       if (!ptr.isNullPointer) {
         lastOption = ptr.readString();
